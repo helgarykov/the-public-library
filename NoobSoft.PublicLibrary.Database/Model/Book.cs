@@ -8,5 +8,4 @@ public class Book
     public Author Author { get; set; }
     public DateTime Published { get; set; }
     public string Summary { get; set; }
-    //public
 }
