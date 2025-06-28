@@ -10,4 +10,16 @@
     <PackageReference Include="CsvHelper" Version="27.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\authors.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\books.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\loaners.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

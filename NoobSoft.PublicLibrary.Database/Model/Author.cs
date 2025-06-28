@@ -2,10 +2,8 @@ namespace NoobSoft.PublicLibrary.Database.Model;
 
 public class Author : Person
 {
-    private List<Book> loanedBooks { get; set; }
-
-    public Author(Guid id, string name, DateTime birthday) : base(id, name, birthday)
-    {
-        loanedBooks = new List<Book>();
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public DateTime Birthday { get; set; }
+    public List<Book> Books { get; set; } = new();
 }
