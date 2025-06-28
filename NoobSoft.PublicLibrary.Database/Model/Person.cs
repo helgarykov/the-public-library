@@ -17,4 +17,8 @@ public abstract class Person
         this.name = name;
         this.birthday = birthday;
     }
+
+    public Guid Id => id;
+    public string Name => name;
+    public DateTime Birthday => birthday;
 }
