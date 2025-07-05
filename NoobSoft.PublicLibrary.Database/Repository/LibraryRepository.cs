@@ -1,4 +1,3 @@
-using CsvHelper.Configuration;
 using NoobSoft.PublicLibrary.Database.DataManagement;
 using NoobSoft.PublicLibrary.Database.Model;
 
@@ -46,5 +45,13 @@ namespace NoobSoft.PublicLibrary.Database.Repository
             }
         }
 
+        /// <summary>
+        /// Placeholder for linking loaners to their loaned books.
+        /// Not implemented because loaners.csv contains no loan information.
+        /// </summary>
+        private void LinkLoanersToBooks()
+        {
+            // No loan data available to perform linking.
+        }
     }
 }

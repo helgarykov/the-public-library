@@ -10,9 +10,9 @@ namespace NoobSoft.PublicLibrary.Database.DataManagement
     {
         public LoanerMap()
         {
-            Map(m => m.Id).Name("Id");
-            Map(m => m.Name).Name("Name");
-            Map(m => m.Birthday)
+            Map(l => l.Id).Name("Id");
+            Map(l => l.Name).Name("Name");
+            Map(l => l.Birthday)
                 .Name("Birthday")
                 .TypeConverterOption
                 .Format("MM/dd/yyyy HH:mm:ss");
