@@ -21,10 +21,10 @@ namespace NoobSoft.PublicLibrary.Database.DataManagement
         public static List<T> LoadCsv<T, TMap>(string filePath)
             where TMap : ClassMap<T>, new()
         {
-            using var reader = new StreamReader(filePath);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<TMap>();
-            return csv.GetRecords<T>().ToList();
+            using var reader = new StreamReader(filePath);  // Opens the CSV file using the provided file path
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);    // Creates a CsvReader from the file. Uses InvariantCulture to standardize parsing (e.g. dates, numbers).
+            csv.Context.RegisterClassMap<TMap>();   // Registers your mapping class (like AuthorMap) that tells CsvHelper how to map CSV columns to properties
+            return csv.GetRecords<T>().ToList();    // Parses the CSV into List<T> using the mapping you registered.
         }
     }    
 }
