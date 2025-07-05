@@ -8,20 +8,15 @@ namespace NoobSoft.PublicLibrary.Database.Tests;
 public class CsvImportTests
 {
     private readonly ITestOutputHelper _out;
-    private readonly string _dataFolder;
     
     public CsvImportTests(ITestOutputHelper output)
     {
         _out = output;
-        _dataFolder = Path.Combine(AppContext.BaseDirectory, "Data");
     }
 
     [Fact]
     public void Test_LoadAuthorsFromCsv()
     {
-        // var path = Path.Combine(_dataFolder, "authors.csv");
-        // var authors = CsvDataImporter.Load<Author, AuthorMap>(path);
-        
         var authors = LoadTestCsv<Author, AuthorMap>("authors.csv");
         
         Assert.NotEmpty(authors);
@@ -60,7 +55,7 @@ public class CsvImportTests
     /// <summary>
     /// Generic helper to load a list of records from a CSV file using CsvDataImporter.
     /// </summary>
-    private List<T> LoadTestCsv<T, TMap>(string fileName)
+    private static List<T> LoadTestCsv<T, TMap>(string fileName)
         where TMap : ClassMap<T>, new()
     {
         var fullPath = Path.Combine(AppContext.BaseDirectory, "Data", fileName);
