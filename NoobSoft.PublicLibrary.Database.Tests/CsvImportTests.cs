@@ -1,3 +1,4 @@
+using CsvHelper.Configuration;
 using NoobSoft.PublicLibrary.Database.DataManagement;
 using NoobSoft.PublicLibrary.Database.Model;
 using Xunit.Abstractions;
@@ -18,25 +19,23 @@ public class CsvImportTests
     [Fact]
     public void Test_LoadAuthorsFromCsv()
     {
-        var path = Path.Combine(_dataFolder, "authors.csv");
-        var authors = CsvDataImporter.Load<Author, AuthorMap>(path);
-
-
+        // var path = Path.Combine(_dataFolder, "authors.csv");
+        // var authors = CsvDataImporter.Load<Author, AuthorMap>(path);
+        
+        var authors = LoadTestCsv<Author, AuthorMap>("authors.csv");
+        
         Assert.NotNull(authors);
         Assert.NotEmpty(authors);
 
         _out.WriteLine($"Loaded {authors.Count} authors");
-        _out.WriteLine($"First: {authors[0].Name}, {authors[0].Birthday:yyyy-MM-dd}");
+        _out.WriteLine($"First: {authors[499].Name}, {authors[499].Birthday:yyyy-MM-dd}");
     }
     
     [Fact]
     public void Test_LoadBooksFromCsv()
     {
-        var path = Path.Combine(_dataFolder, "books.csv");
-        var books = CsvDataImporter.Load<Book, BookMap>(path);
-        
-        var authorPath = Path.Combine(_dataFolder, "authors.csv");
-        var authors = CsvDataImporter.Load<Author, AuthorMap>(authorPath);
+        var books = LoadTestCsv<Book,BookMap>("books.csv");
+        var authors = LoadTestCsv<Author, AuthorMap>("authors.csv");
         
         var authorsById = authors.ToDictionary(a => a.Id);  // <- link Book.AuthorId to Author.Id in memory (e.g., via Dictionary<Guid, Author>).
         foreach (var book in books)
@@ -52,4 +51,15 @@ public class CsvImportTests
         var firstBook = books[0];
         _out.WriteLine($"First book: {firstBook.Title}, by: {firstBook.Author.Name}");
     }
+    
+    /// <summary>
+    /// Generic helper to load a list of records from a CSV file using CsvDataImporter.
+    /// </summary>
+    private List<T> LoadTestCsv<T, TMap>(string fileName)
+        where TMap : ClassMap<T>, new()
+    {
+        var fullPath = Path.Combine(AppContext.BaseDirectory, "Data", fileName);
+        return CsvDataImporter.LoadCsv<T, TMap>(fullPath);
+    }
+
 }

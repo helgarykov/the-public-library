@@ -18,7 +18,7 @@ namespace NoobSoft.PublicLibrary.Database.DataManagement
     ///     where TMap : ClassMap<T>, new()
     public static class CsvDataImporter
     {
-        public static List<T> Load<T, TMap>(string filePath)
+        public static List<T> LoadCsv<T, TMap>(string filePath)
             where TMap : ClassMap<T>, new()
         {
             using var reader = new StreamReader(filePath);
