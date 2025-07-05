@@ -13,7 +13,7 @@ namespace NoobSoft.PublicLibrary.Database.DataManagement
             Map(m => m.Id).Name("Id");
             Map(m => m.ISBN).Name("ISBN");
             Map(m => m.Title).Name("Title");
-            Map(m => m.Author).Name("Author");
+            Map(m => m.AuthorId).Name("Author");    // ← this matches the author 
             Map(m => m.Published)
                 .Name("Published")
                 .TypeConverterOption
