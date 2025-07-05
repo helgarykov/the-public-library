@@ -24,11 +24,16 @@ public class CsvImportTests
         
         var authors = LoadTestCsv<Author, AuthorMap>("authors.csv");
         
-        Assert.NotNull(authors);
         Assert.NotEmpty(authors);
+        Assert.All(authors, author =>
+        {
+            Assert.NotEqual(Guid.Empty, author.Id);
+            Assert.False(string.IsNullOrWhiteSpace(author.Name));
+            Assert.True(author.Birthday.Year > 1800);
+        });
 
         _out.WriteLine($"Loaded {authors.Count} authors");
-        _out.WriteLine($"First: {authors[499].Name}, {authors[499].Birthday:yyyy-MM-dd}");
+        _out.WriteLine($"Last: {authors[499].Name}, {authors[499].Birthday:yyyy-MM-dd}");
     }
     
     [Fact]
@@ -42,9 +47,9 @@ public class CsvImportTests
         {
             book.Author = authorsById[book.AuthorId];   // <- After linking, you set:
         }
-
-        Assert.NotNull(books);
+        
         Assert.NotEmpty(books);
+        Assert.All(books, book => Assert.NotNull(book.Author));
         
         _out.WriteLine($"Loaded {books.Count} books");
         
