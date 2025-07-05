@@ -51,6 +51,23 @@ public class CsvImportTests
         var firstBook = books[0];
         _out.WriteLine($"First book: {firstBook.Title}, by: {firstBook.Author.Name}");
     }
+
+    [Fact]
+    public void Test_LoadLoanersFromCsv()
+    {
+        var loaners = LoadTestCsv<Loaner, LoanerMap>("loaners.csv");
+        
+        Assert.NotEmpty(loaners);
+        Assert.All(loaners , loaner =>
+        {
+            Assert.NotEqual(Guid.Empty, loaner.Id);
+            Assert.False(string.IsNullOrWhiteSpace(loaner.Name));
+            Assert.True(loaner.Birthday.Year > 1800);
+        });
+        
+        _out.WriteLine($"Loaded {loaners.Count} loaners");
+        _out.WriteLine($"First loaner: {loaners[0].Name}, born on {loaners[0].Birthday:yyyy-MM-dd}");
+    }
     
     /// <summary>
     /// Generic helper to load a list of records from a CSV file using CsvDataImporter.
