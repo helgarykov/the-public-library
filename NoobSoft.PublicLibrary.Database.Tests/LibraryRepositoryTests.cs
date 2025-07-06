@@ -12,15 +12,33 @@ namespace NoobSoft.PublicLibrary.Database.Tests
         private readonly List<Author> _authors;
         private readonly List<Book> _books;
         private readonly List<Loaner> _loaners;
+        private readonly List<string> _importLog; 
 
         public LibraryRepositoryTests(ITestOutputHelper output)
         {
             _out = output;
+            
              var repo = new LibraryRepository();
+             repo.LoadData();   // explicit loading instead of constructor logic
+             
+            _importLog = repo.ImportLog;
             _authors = repo.GetAllAuthors();
             _books = repo.GetAllBooks();
             _loaners = repo.GetAllLoaners();
+            
+            foreach (var error in _importLog)
+            {
+                _out.WriteLine($"⚠️ Import error: {error}");
+            }
         }
+        
+        [Fact]
+        public void Should_Log_Exactly_Three_Invalid_ISBNs()
+        {
+            var invalidIsbnErrors = _importLog.Where(e => e.Contains("Invalid ISBN")).ToList();
+            Assert.Equal(3, invalidIsbnErrors.Count);
+        }
+
         
         [Fact]
         public void Repository_Should_Load_AllBooks()
@@ -66,7 +84,7 @@ namespace NoobSoft.PublicLibrary.Database.Tests
             {
                 Id = Guid.NewGuid(),
                 Title = "Orphaned Book",
-                ISBN = new Isbn("999-9999999999"),
+                ISBN = new Isbn("9780306406157"),   // ← known valid ISBN-13
                 AuthorId = orphanId, // ID that does not exist in authors
                 Published = DateTime.Now,
                 Summary = "No matching author should be linked",

@@ -10,19 +10,28 @@ namespace NoobSoft.PublicLibrary.Database.Repository
     /// </summary>
     public class LibraryRepository
     {
-        private readonly List<Author> _authors;
-        private readonly List<Book> _books;
-        private readonly List<Loaner> _loaners;
+        private List<Author> _authors;
+        private List<Book> _books;
+        private List<Loaner> _loaners;
 
-        public LibraryRepository()
+        public List<string> ImportLog { get; } = new(); // ← Store all import errors
+
+        public void LoadData()
         {
-            _authors = CsvDataImporter.LoadCsv<Author, AuthorMap>("Data/authors.csv");
-            _books = CsvDataImporter.LoadCsv<Book, BookMap>("Data/books.csv");
-            _loaners = CsvDataImporter.LoadCsv<Loaner, LoanerMap>("Data/loaners.csv");
+            var (authorRecords, authorErrors) = CsvDataImporter.LoadCsv<Author, AuthorMap>("Data/authors.csv");
+            var (bookRecords, bookErrors) = CsvDataImporter.LoadCsv<Book, BookMap>("Data/books.csv");
+            var (loanerRecords, loanerErrors) = CsvDataImporter.LoadCsv<Loaner, LoanerMap>("Data/loaners.csv");
+            
+            _authors = authorRecords;
+            _books = bookRecords;
+            _loaners = loanerRecords;
+            
+            ImportLog.AddRange(authorErrors);
+            ImportLog.AddRange(bookErrors);
+            ImportLog.AddRange(loanerErrors);
             
             LinkBooksToAuthors();
         }
-
         public List<Author> GetAllAuthors() => _authors;
         public List<Book> GetAllBooks() => _books;
         public List<Loaner> GetAllLoaners() => _loaners;

@@ -14,9 +14,17 @@ namespace NoobSoft.PublicLibrary.Database.DataManagement
     /// Must inherit from <see cref="ClassMap{T}"/> and have a public parameterless constructor.
     /// </typeparam>
     /// <param name="filePath">The path to the CSV file to load.</param>
-    /// <returns>A list of <typeparamref name="T"/> objects populated from the CSV data.</returns>
-    ///     public static List<T> Load<T, TMap>(string filePath)
-    ///     where TMap : ClassMap<T>, new()
+    /// <returns>
+    /// A tuple containing:
+    /// <list type="bullet">
+    /// <item>
+    /// <description><c>Records</c>: A list of successfully parsed <typeparamref name="T"/> objects.</description>
+    /// </item>
+    /// <item>
+    /// <description><c>Errors</c>: A list of error messages describing records that could not be parsed (e.g., due to invalid data such as ISBN).</description>
+    /// </item>
+    /// </list>
+    /// </returns>
     public static class CsvDataImporter
     {
         public static (List<T> Records, List<string> Errors) LoadCsv<T, TMap>(string filePath)
@@ -49,7 +57,8 @@ namespace NoobSoft.PublicLibrary.Database.DataManagement
                 }
                 catch (Exception ex)
                 {
-                    errors.Add($"Row {csv.Context.Parser.RawRow}: {ex.Message}");
+                    var root = ex.InnerException ?? ex;
+                    errors.Add($"Row {csv.Context.Parser.RawRow}: {root.Message}");
                 }
             }
             return (records, errors);
