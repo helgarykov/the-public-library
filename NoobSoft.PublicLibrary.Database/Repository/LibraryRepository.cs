@@ -41,7 +41,14 @@ namespace NoobSoft.PublicLibrary.Database.Repository
             var authorsById = _authors.ToDictionary(a => a.Id);
             foreach (var book in _books)
             {
-                book.Author = authorsById[book.AuthorId];
+                if (authorsById.TryGetValue(book.AuthorId, out var author))
+                {
+                    book.Author = author;  // ← only if author exists
+                }
+                else
+                {
+                    book.Author = null;  // or leave it unassigned
+                }
             }
         }
 
