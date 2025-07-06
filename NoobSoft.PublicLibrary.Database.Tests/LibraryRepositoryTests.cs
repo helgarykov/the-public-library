@@ -9,7 +9,6 @@ namespace NoobSoft.PublicLibrary.Database.Tests
     public class LibraryRepositoryTests
     {
         private readonly ITestOutputHelper _out;
-        private readonly LibraryRepository _repo;
         private readonly List<Author> _authors;
         private readonly List<Book> _books;
         private readonly List<Loaner> _loaners;
@@ -17,10 +16,10 @@ namespace NoobSoft.PublicLibrary.Database.Tests
         public LibraryRepositoryTests(ITestOutputHelper output)
         {
             _out = output;
-            _repo = new LibraryRepository();
-            _authors = _repo.GetAllAuthors();
-            _books = _repo.GetAllBooks();
-            _loaners = _repo.GetAllLoaners();
+             var repo = new LibraryRepository();
+            _authors = repo.GetAllAuthors();
+            _books = repo.GetAllBooks();
+            _loaners = repo.GetAllLoaners();
         }
         
         [Fact]
@@ -29,7 +28,7 @@ namespace NoobSoft.PublicLibrary.Database.Tests
             Assert.NotEmpty(_books);
             Assert.All(_books, b => Assert.NotEqual(Guid.Empty, b.Id));
             Assert.All(_books, b => Assert.False(string.IsNullOrWhiteSpace(b.Title)));
-            Assert.All(_books, b => Assert.False(string.IsNullOrWhiteSpace(b.ISBN)));
+            Assert.All(_books, b => Assert.False(string.IsNullOrWhiteSpace(b.ISBN.ToString())));
         }
 
         [Fact]
@@ -57,7 +56,6 @@ namespace NoobSoft.PublicLibrary.Database.Tests
             });
         }
 
-
         [Fact]
         public void Repository_Should_Not_Link_To_Unknown_Authors()
         {
@@ -68,7 +66,7 @@ namespace NoobSoft.PublicLibrary.Database.Tests
             {
                 Id = Guid.NewGuid(),
                 Title = "Orphaned Book",
-                ISBN = "999-9999999999",
+                ISBN = new Isbn("999-9999999999"),
                 AuthorId = orphanId, // ID that does not exist in authors
                 Published = DateTime.Now,
                 Summary = "No matching author should be linked",
@@ -98,7 +96,6 @@ namespace NoobSoft.PublicLibrary.Database.Tests
 
             _out.WriteLine($"✔ All orphaned books were not linked.");
         }
-    
     }    
 }
 
