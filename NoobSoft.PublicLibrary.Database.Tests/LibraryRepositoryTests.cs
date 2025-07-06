@@ -22,6 +22,23 @@ namespace NoobSoft.PublicLibrary.Database.Tests
             _books = _repo.GetAllBooks();
             _loaners = _repo.GetAllLoaners();
         }
+        
+        [Fact]
+        public void Repository_Should_Load_AllBooks()
+        {
+            Assert.NotEmpty(_books);
+            Assert.All(_books, b => Assert.NotEqual(Guid.Empty, b.Id));
+            Assert.All(_books, b => Assert.False(string.IsNullOrWhiteSpace(b.Title)));
+            Assert.All(_books, b => Assert.False(string.IsNullOrWhiteSpace(b.ISBN)));
+        }
+
+        [Fact]
+        public void Repository_Should_Load_AllLoaners()
+        {
+            Assert.NotEmpty(_loaners);
+            Assert.All(_loaners, l => Assert.NotEqual(Guid.Empty, l.Id));
+        }
+        
         [Fact]
         public void Repository_Should_Load_AllAuthors()
         {
