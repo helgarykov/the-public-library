@@ -19,10 +19,6 @@ public class CsvImportTests
     {
         var (authors, authorErrors) = LoadTestCsvWithErrors<Author, AuthorMap>("authors.csv");
         
-        // Log any CSV errors
-        foreach (var error in authorErrors)
-            _out.WriteLine($"❌ Author import error: {error}");
-        
         Assert.NotEmpty(authors);
         Assert.All(authors, author =>
         {

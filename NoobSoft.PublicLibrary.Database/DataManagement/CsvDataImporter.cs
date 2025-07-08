@@ -54,6 +54,8 @@ namespace NoobSoft.PublicLibrary.Database.DataManagement
                 {
                     var record = csv.GetRecord<T>();
                     records.Add(record);
+                    //Console.WriteLine($"📄 RAW LINE [{csv.Context.Parser.Row}]: {csv.Context.Parser.RawRecord}");
+
                 }
                 catch (Exception ex)
                 {

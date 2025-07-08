@@ -1,5 +1,6 @@
 using NoobSoft.PublicLibrary.Database.DataManagement;
 using NoobSoft.PublicLibrary.Database.Model;
+using System.Globalization;
 
 namespace NoobSoft.PublicLibrary.Database.Repository
 {
@@ -15,6 +16,7 @@ namespace NoobSoft.PublicLibrary.Database.Repository
         private List<Loaner> _loaners;
 
         public List<string> ImportLog { get; } = new(); // ← Store all import errors
+
 
         public void LoadData()
         {
@@ -76,20 +78,48 @@ namespace NoobSoft.PublicLibrary.Database.Repository
         /// <remarks>
         /// The search uses the string representation of the <see cref="Isbn"/> object and performs a case-insensitive substring match.
         /// </remarks>
-        public List<Person> FindPeopleByPartioalNameOrBirthday(string search)
+        public List<Person> FindPeopleByPartialNameOrBirthday(string search)
         {
-            search = search.ToLowerInvariant();
-            var isDate = DateTime.TryParse(search, out DateTime parsedDate);
+            return FindMatchesIn(_authors.Cast<Person>().Concat(_loaners), search);
+        }
 
-            var matches = new List<Person>();
+        
+        private List<Person> FindMatchesIn(IEnumerable<Person> people, string search)
+        {
+            //DateTime.TryParse(search, out DateTime parsedDate);
             
-            matches.AddRange(_authors 
-                .Where(a => a.Name.ToLowerInvariant().Contains(search) || (isDate && a.Birthday.Date == parsedDate.Date)));
-            
-            matches.AddRange(_loaners
-                .Where(l => l.Name.ToLowerInvariant().Contains(search) || (isDate && l.Birthday.Date == parsedDate)));
-            
-            return matches;
+            // Console.WriteLine($"🔎 Searching for: '{search}'");
+            //
+            // if (DateTime.TryParse(search, out DateTime parsedDate))
+            // {
+            //     Console.WriteLine($"📅 Parsed date: {parsedDate:yyyy-MM-dd}");
+            // }
+            // else
+            // {
+            //     Console.WriteLine("❌ Could not parse date");
+            // }
+
+            DateTime.TryParseExact(
+                search,
+                new[] { "MM/dd/yyyy", "M/d/yyyy" },   // Accept both formats
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out DateTime parsedDate
+            );
+
+            return people
+                .Where(p =>
+                {
+                    if (string.IsNullOrWhiteSpace(p.Name))
+                        return false;
+
+                    var nameParts = p.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var firstName = nameParts.Length > 0 ? nameParts[0] : "";
+
+                    return firstName.StartsWith(search, StringComparison.OrdinalIgnoreCase)
+                           || p.Birthday.Date == parsedDate.Date;
+                })
+                .ToList();
         }
         
         

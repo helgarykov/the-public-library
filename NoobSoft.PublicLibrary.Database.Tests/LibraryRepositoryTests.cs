@@ -115,6 +115,7 @@ namespace NoobSoft.PublicLibrary.Database.Tests
 
             _out.WriteLine($"✔ All orphaned books were not linked.");
         }
+        
 
         [Fact]
         public void FindBooksByPartialIsbn_Should_Find_Matching_Books()
@@ -132,7 +133,29 @@ namespace NoobSoft.PublicLibrary.Database.Tests
                 _out.WriteLine($"Found book {count ++}: {book.Title} with ISBN: {book.ISBN}");
             }
         }
-        
+
+        [Fact]
+        public void FindPeopleByPartialName_Should_Find_Matching_Authors_Or_Loaners()
+        {
+            string partialName = "Bi";
+            string birthday = "01/06/1885";
+            
+            // Act
+            var resultByName = _repo.FindPeopleByPartialNameOrBirthday(partialName);
+            var resultByDate = _repo.FindPeopleByPartialNameOrBirthday(birthday);
+
+            var combinedResults = resultByName.Concat(resultByDate).Distinct().ToList();
+            
+            int count = 1;
+            foreach (var person in combinedResults)
+            {
+                Assert.NotNull(person.Name);
+                var type = person is Author ? "Author" :
+                    person is Loaner ? "Loaner" : "Unknown";
+
+                _out.WriteLine($"👤 Person {count++}: [{type}] '{person.Name}', Birthday: {person.Birthday:yyyy-MM-dd}");
+            }
+        }
         
     }    
 }
