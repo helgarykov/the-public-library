@@ -79,8 +79,7 @@ namespace NoobSoft.PublicLibrary.Database.Repository
         public List<Person> FindPeopleByPartioalNameOrBirthday(string search)
         {
             search = search.ToLowerInvariant();
-            DateTime parsedDate;
-            var isDate = DateTime.TryParse(search, out parsedDate);
+            var isDate = DateTime.TryParse(search, out DateTime parsedDate);
 
             var matches = new List<Person>();
             

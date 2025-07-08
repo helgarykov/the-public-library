@@ -9,6 +9,7 @@ namespace NoobSoft.PublicLibrary.Database.Tests
     public class LibraryRepositoryTests
     {
         private readonly ITestOutputHelper _out;
+        private readonly LibraryRepository _repo;
         private readonly List<Author> _authors;
         private readonly List<Book> _books;
         private readonly List<Loaner> _loaners;
@@ -18,13 +19,13 @@ namespace NoobSoft.PublicLibrary.Database.Tests
         {
             _out = output;
             
-             var repo = new LibraryRepository();
-             repo.LoadData();   // explicit loading instead of constructor logic
+             _repo = new LibraryRepository();
+             _repo.LoadData();   // explicit loading instead of constructor logic
              
-            _importLog = repo.ImportLog;
-            _authors = repo.GetAllAuthors();
-            _books = repo.GetAllBooks();
-            _loaners = repo.GetAllLoaners();
+            _importLog = _repo.ImportLog;
+            _authors = _repo.GetAllAuthors();
+            _books = _repo.GetAllBooks();
+            _loaners = _repo.GetAllLoaners();
             
             foreach (var error in _importLog)
             {
@@ -114,6 +115,25 @@ namespace NoobSoft.PublicLibrary.Database.Tests
 
             _out.WriteLine($"✔ All orphaned books were not linked.");
         }
+
+        [Fact]
+        public void FindBooksByPartialIsbn_Should_Find_Matching_Books()
+        {
+            string partialIsbn = "97841";
+
+            var result = _repo.FindBooksByPartialIsbn(partialIsbn);
+
+            Assert.NotEmpty(result);
+            Assert.All(result, book => Assert.Contains(partialIsbn, book.ISBN.ToString()));
+
+            int count = 1;
+            foreach (var book in result)
+            {
+                _out.WriteLine($"Found book {count ++}: {book.Title} with ISBN: {book.ISBN}");
+            }
+        }
+        
+        
     }    
 }
 
