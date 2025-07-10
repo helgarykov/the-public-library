@@ -9,7 +9,7 @@ namespace NoobSoft.PublicLibrary.Database.Tests
     public class LibraryRepositoryTests
     {
         private readonly ITestOutputHelper _out;
-        private readonly LibraryRepository _repo;
+        private readonly ILibraryRepository _repo;
         private readonly List<Author> _authors;
         private readonly List<Book> _books;
         private readonly List<Loaner> _loaners;

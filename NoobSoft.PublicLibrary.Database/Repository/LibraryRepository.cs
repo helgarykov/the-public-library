@@ -9,7 +9,7 @@ namespace NoobSoft.PublicLibrary.Database.Repository
     /// collections of <see cref="Author"/>, <see cref="Book"/>, and <see cref="Loaner"/> entities.
     /// Enables retrieval of all records or a specific item by its <see cref="Guid"/> identifier.
     /// </summary>
-    public class LibraryRepository
+    public class LibraryRepository : ILibraryRepository
     {
         private readonly ICsvDataImporter _csvDataImporter;
         
