@@ -18,8 +18,11 @@ namespace NoobSoft.PublicLibrary.Database.Tests
         public LibraryRepositoryTests(ITestOutputHelper output)
         {
             _out = output;
+
+            var testDataPath = Path.Combine(AppContext.BaseDirectory, "Data");
+            var importer = new CsvDataImporterService(testDataPath);
             
-             _repo = new LibraryRepository();
+             _repo = new LibraryRepository(importer);
              _repo.LoadData();   // explicit loading instead of constructor logic
              
             _importLog = _repo.ImportLog;

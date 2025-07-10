@@ -111,11 +111,12 @@ public class CsvImportTests
     /// </item>
     /// </list>
     /// </returns>
-    private static (List<T> Records, List<string> Errors) LoadTestCsvWithErrors<T, TMap>(string fileName)
+   private static (List<T> Records, List<string> Errors) LoadTestCsvWithErrors<T, TMap>(string fileName)
         where TMap : ClassMap<T>, new()
     {
         var fullPath = Path.Combine(AppContext.BaseDirectory, "Data", fileName);
-        return CsvDataImporter.LoadCsv<T, TMap>(fullPath);
+        var importer = new CsvDataImporterService("unused-path"); // base path unused here
+        return importer.LoadCsv<T, TMap>(fullPath);
     }
 
 }

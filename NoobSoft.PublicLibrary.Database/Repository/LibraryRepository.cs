@@ -11,18 +11,23 @@ namespace NoobSoft.PublicLibrary.Database.Repository
     /// </summary>
     public class LibraryRepository
     {
+        private readonly ICsvDataImporter _csvDataImporter;
+        
         private List<Author> _authors;
         private List<Book> _books;
         private List<Loaner> _loaners;
 
         public List<string> ImportLog { get; } = new(); // ← Store all import errors
 
-
+        public LibraryRepository(ICsvDataImporter csvDataImporter)
+        {
+            _csvDataImporter = csvDataImporter;
+        }
         public void LoadData()
         {
-            var (authorRecords, authorErrors) = CsvDataImporter.LoadCsv<Author, AuthorMap>("Data/authors.csv");
-            var (bookRecords, bookErrors) = CsvDataImporter.LoadCsv<Book, BookMap>("Data/books.csv");
-            var (loanerRecords, loanerErrors) = CsvDataImporter.LoadCsv<Loaner, LoanerMap>("Data/loaners.csv");
+            var (authorRecords, authorErrors) = _csvDataImporter.ImportAuthors();
+            var (bookRecords, bookErrors) = _csvDataImporter.ImportBooks();
+            var (loanerRecords, loanerErrors) = _csvDataImporter.ImportLoaners();
             
             _authors = authorRecords;
             _books = bookRecords;

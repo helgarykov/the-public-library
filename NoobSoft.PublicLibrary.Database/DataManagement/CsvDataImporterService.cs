@@ -5,29 +5,33 @@ using NoobSoft.PublicLibrary.Database.Model;
 
 namespace NoobSoft.PublicLibrary.Database.DataManagement
 {
-    /// <summary>
-    /// Loads a CSV file and maps its rows into a list of objects of type <typeparamref name="T"/> using CsvHelper.
-    /// </summary>
-    /// <typeparam name="T">The type of object to deserialize each CSV row into (e.g., Author, Book).</typeparam>
-    /// <typeparam name="TMap">
-    /// The CsvHelper mapping class for <typeparamref name="T"/> (e.g., AuthorMap). 
-    /// Must inherit from <see cref="ClassMap{T}"/> and have a public parameterless constructor.
-    /// </typeparam>
-    /// <param name="filePath">The path to the CSV file to load.</param>
-    /// <returns>
-    /// A tuple containing:
-    /// <list type="bullet">
-    /// <item>
-    /// <description><c>Records</c>: A list of successfully parsed <typeparamref name="T"/> objects.</description>
-    /// </item>
-    /// <item>
-    /// <description><c>Errors</c>: A list of error messages describing records that could not be parsed (e.g., due to invalid data such as ISBN).</description>
-    /// </item>
-    /// </list>
-    /// </returns>
-    public static class CsvDataImporter
+
+    public class CsvDataImporterService : ICsvDataImporter
     {
-        public static (List<T> Records, List<string> Errors) LoadCsv<T, TMap>(string filePath)
+        private readonly string _authorFilePath;
+        private readonly string _bookFilePath;
+        private readonly string _loanerFilePath;
+
+        public CsvDataImporterService(string dataDirectory)
+        {
+            _authorFilePath = Path.Combine(dataDirectory, "authors.csv");
+            _bookFilePath = Path.Combine(dataDirectory, "books.csv");
+            _loanerFilePath = Path.Combine(dataDirectory, "loaners.csv");
+        }
+
+        public (List<Author> Records, List<string> Errors) ImportAuthors()
+            => LoadCsv<Author, AuthorMap>(_authorFilePath);
+        
+        public (List<Book> Records, List<string> Errors) ImportBooks()
+            => LoadCsv<Book, BookMap>(_bookFilePath);
+        
+        public (List<Loaner> Records, List<string> Errors) ImportLoaners()
+            => LoadCsv<Loaner, LoanerMap>(_loanerFilePath);
+        
+        /// <summary>
+        /// Loads and parses a CSV file into a list of typed records using CsvHelper and the specified map.
+        /// </summary>
+        internal (List<T> Records, List<string> Errors) LoadCsv<T, TMap>(string filePath)
             where TMap : ClassMap<T>, new()
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
