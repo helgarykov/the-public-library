@@ -148,7 +148,24 @@ namespace NoobSoft.PublicLibrary.Database.Repository
                 }
             }
         }
+    
+        
+        /*public Book? GetBookByIsbn(string isbn)
+        {
+            return _books.FirstOrDefault(b =>
+                b.ISBN.ToString().Equals(isbn, StringComparison.OrdinalIgnoreCase));
+        }
 
+        
+        public Person? GetPersonById(Guid id)
+        {
+            return _authors.Cast<Person>()
+                .Concat(_loaners)
+                .FirstOrDefault(p => p.Id == id);
+        }*/
+
+        
+        
         /// <summary>
         /// Placeholder for linking loaners to their loaned books.
         /// Not implemented because loaners.csv contains no loan information.
