@@ -16,6 +16,7 @@ namespace NoobSoft.PublicLibrary.Database.Repository
         private List<Author> _authors;
         private List<Book> _books;
         private List<Loaner> _loaners;
+        private List<Loan> _loans;
 
         public List<string> ImportLog { get; } = new(); // ← Store all import errors
 
@@ -42,6 +43,13 @@ namespace NoobSoft.PublicLibrary.Database.Repository
         public List<Author> GetAllAuthors() => _authors;
         public List<Book> GetAllBooks() => _books;
         public List<Loaner> GetAllLoaners() => _loaners;
+
+        public List<Loan> GetAllLoans() => _loans;
+
+        public void AddLoan(Loan loan)
+        {
+            _loans.Add(loan);
+        }
         
         public Author? GetAuthorById(Guid id) => _authors.FirstOrDefault(a => a.Id == id);
         public Book? GetBookById(Guid id) => _books.FirstOrDefault(b => b.Id == id);

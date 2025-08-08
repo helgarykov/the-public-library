@@ -13,6 +13,11 @@ public interface ILibraryRepository
     Book? GetBookById(Guid id);
     Loaner? GetLoanerById(Guid id);
 
+    void AddLoan(Loan loan);
+    // void UpdateLoan(Loan loan);
+    
+    List<Loan> GetAllLoans();
+
     List<Book> FindBooksByPartialIsbn(string partialIsbn);
     List<Person> FindPeopleByPartialNameOrBirthday(string search);
 
