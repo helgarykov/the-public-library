@@ -1,5 +1,7 @@
 namespace NoobSoft.PublicLibrary.Database.Business.Fees.Internal;
-
+/// <summary>
+/// Internal pure helpers
+/// </summary>
 internal static class FeeCalculator
 {
     // Late fee: 10 coins once when overdue (days >= 1), plus 5 coins for every additional FULL 5-day block.
