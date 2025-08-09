@@ -43,4 +43,39 @@ public class LoanService : ILoanService
         _repo.AddLoan(loan);
         return true;
     }
+    
+    public bool ReturnBook(Guid bookId)
+    {
+        var loan = _repo.GetAllLoans()
+            .FirstOrDefault(l => l.BookId == bookId && l.ReturnedAt == null);
+
+        if (loan == null)
+            return false;
+        
+        loan.ReturnedAt = _timeProvider.Now;
+        return true;
+    }
+
+    public IEnumerable<Book?> GetBooksLoanedByPerson(Guid loanerId)
+    {
+        var activeLoans = _repo.GetAllLoans()
+            .Where(l => l.LoanerId == loanerId && l.ReturnedAt == null);
+
+        return activeLoans
+            .Select(l => _repo.GetBookById(l.BookId))   // from loan type to book type
+            .Where(b => b != null);  // filter any null books
+    } 
+    
+    public IEnumerable<Loan> GetLoansForBook(Guid bookId)
+    {
+        return _repo.GetAllLoans()
+            .Where(l => l.BookId == bookId);
+    }
+    
+    public Loan? IsBookLoaned_ReturnsLoanOrNull(Guid bookId)
+    {
+        return _repo.GetAllLoans()
+            .FirstOrDefault(l => l.BookId == bookId && l.ReturnedAt == null);
+    }
+    
 }
