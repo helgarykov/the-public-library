@@ -1,0 +1,4 @@
+Id,LoanerId,LoanId,Type,Amount,Reason,PostedAt
+f4a92b7d-8d78-4c8a-930b-5b78a1fcd9b5,6f8cb129-5a91-4b47-a913-93f73073cf47,3b27e3aa-2d36-4d3e-b07f-9fcb83b8915c,Fee,15.00,Late fee (6–10 days overdue),2025-08-10T14:00:00Z
+7ac8b6f0-bb86-41dd-b02f-5fbf73c3a7f2,6f8cb129-5a91-4b47-a913-93f73073cf47,,Payment,-20.00,Card payment,2025-08-11T09:15:00Z
+
