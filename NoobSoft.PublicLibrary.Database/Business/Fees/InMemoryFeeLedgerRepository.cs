@@ -10,5 +10,7 @@ public class InMemoryFeeLedgerRepository : IFeeLedgerRepository
         _entries.Where(e => e.LoanerId == loanerId)
             .OrderBy(e => e.PostedAt)
             .ToList();
-    
+
+    public decimal GetOutstandingDebt(Guid loanerId) => 
+        GetByLoaner(loanerId).Sum(e => e.Amount);
 }

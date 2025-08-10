@@ -14,7 +14,7 @@ public interface IFeeService
     bool IsSuspended(Guid loanerId);                        // debt >= 100?
     
     // Effects (mutate ledger/ repo)
-    LedgerEntry PostReturn(Loan loan, DateTime returnedAt); // finalize fee for this book at return time
+    PostReturnResult PostReturn(Loan loan, DateTime returnedAt); // finalize fee for this book at return time
     PaymentReceipt RecordPayment(Guid loanerId, decimal amount, DateTime when);
     IReadOnlyList<LedgerEntry> GetLedger(Guid loanerId);
 }

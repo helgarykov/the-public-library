@@ -49,9 +49,23 @@ public class FeeService : IFeeService
     public bool IsSuspended(Guid loanerId) =>
         _fees.GetOutstandingDebt(loanerId) >= _policy.SuspensionThreshold;
 
-    public LedgerEntry PostReturn(Loan loan, DateTime returnedAt)
+    public PostReturnResult PostReturn(Loan loan, DateTime returnedAt)
     {
-        throw new NotImplementedException();
+       var assessment = AssessLoan(loan, returnedAt);
+       if(!assessment.IsOverdue)
+           return new PostReturnResult(assessment, null);
+       
+       var entry = new LedgerEntry(
+           Id: Guid.NewGuid(),
+           LoanerId: loan.LoanerId,
+           LoanId: loan.Id,
+           Amount: assessment.Fee,
+           Reason: assessment.Reason,
+           PostedAt: returnedAt
+       );
+       
+       _fees.Append(entry);
+       return new PostReturnResult(assessment, entry);
     }
 
     public PaymentReceipt RecordPayment(Guid loanerId, decimal amount, DateTime when)
