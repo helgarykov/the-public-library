@@ -36,21 +36,18 @@ public class FeeService : IFeeService
 
     public bool IsLoanLost(Loan loan, DateTime asOf)
     {
-        throw new NotImplementedException();
+        var overdue = OverdueDays(loan, asOf);
+        return FeeCalculator.IsLost(overdue, _policy);
     }
 
     public int OverdueDays(Loan loan, DateTime asOf) =>
         Math.Max(0, (asOf.Date - loan.DueAt.Date).Days);
 
-    public decimal GetOutstandingDebt(Guid loanerId)
-    {
-        throw new NotImplementedException();
-    }
+    public decimal GetOutstandingDebt(Guid loanerId) =>
+        _fees.GetOutstandingDebt(loanerId);
 
-    public bool IsSuspended(Guid loanerId)
-    {
-        throw new NotImplementedException();
-    }
+    public bool IsSuspended(Guid loanerId) =>
+        _fees.GetOutstandingDebt(loanerId) >= _policy.SuspensionThreshold;
 
     public LedgerEntry PostReturn(Loan loan, DateTime returnedAt)
     {
