@@ -33,16 +33,16 @@ public class FeeServiceTests
         mock.SetupGet(p => p.SuspensionThreshold).Returns(100m);
 
         _policy = mock.Object;
-        _svc = new FeeService(_policy, _fees); 
+        _svc = new FeeService(_policy, _fees);
     }
-    
+
     // ---- OverdueDays ----
     [Fact]
     public void OverdueDays_BeforeDue_Zero()
     {
         var loan = Loan(due: new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 9);
-        
+
         Assert.Equal(0, _svc.OverdueDays(loan, asOf));
     }
 
@@ -51,7 +51,7 @@ public class FeeServiceTests
     {
         var loan = Loan(due: new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 10);
-        
+
         Assert.Equal(0, _svc.OverdueDays(loan, asOf));
     }
 
@@ -60,19 +60,19 @@ public class FeeServiceTests
     {
         var loan = Loan(due: new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 11);
-        
+
         Assert.Equal(1, _svc.OverdueDays(loan, asOf));
     }
-    
+
     // ---- AssessLoan ----
     [Fact]
     public void AssessLoan_NotOverdue_FlagsAndReason()
     {
         var loan = Loan(due: new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 10);
-        
+
         var a = _svc.AssessLoan(loan, asOf);
-        
+
         Assert.False(a.IsOverdue);
         Assert.Equal("None", a.Reason);
         Assert.Equal(0, a.OverdueDays);
@@ -84,9 +84,9 @@ public class FeeServiceTests
     {
         var loan = Loan(due: new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 20);
-        
+
         var a = _svc.AssessLoan(loan, asOf);
-        
+
         Assert.True(a.IsOverdue);
         Assert.False(a.IsLost);
         Assert.Equal("Late fee", a.Reason);
@@ -101,18 +101,18 @@ public class FeeServiceTests
         var asOf = new DateTime(2025, 7, 10); // 181 days overdue => LostAfterDays=180 => lost
 
         var a = _svc.AssessLoan(loan, asOf);
-        
+
         Assert.True(a.IsOverdue);
         Assert.True(a.IsLost);
         Assert.Equal("Lost fee", a.Reason);
         Assert.Equal(181, a.OverdueDays);
         Assert.Equal(300m, a.Fee); // Lost fee=300m
     }
-    
-    
-    
-    
-    
+
+
+
+
+
 
     // ---- helper ----
     private static Loan Loan(DateTime due)
@@ -127,6 +127,5 @@ public class FeeServiceTests
             ReturnedAt = null
         };
     }
+}   
     
-    
-}
