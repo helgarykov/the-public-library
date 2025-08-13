@@ -9,13 +9,11 @@ public class FeeService : IFeeService
 {
     private readonly IFeePolicy _policy;
     private readonly IFeeLedgerRepository _fees;
-    private readonly ILibraryRepository _lib;
     
     public FeeService(IFeePolicy policy, IFeeLedgerRepository fees, ILibraryRepository lib)
     {
         _policy = policy;
         _fees = fees;
-        _lib = lib;
     }
     public FeeAssessment AssessLoan(Loan loan, DateTime asOf)
     {
