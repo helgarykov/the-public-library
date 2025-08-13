@@ -10,7 +10,7 @@ public class FeeService : IFeeService
     private readonly IFeePolicy _policy;
     private readonly IFeeLedgerRepository _fees;
     
-    public FeeService(IFeePolicy policy, IFeeLedgerRepository fees, ILibraryRepository lib)
+    public FeeService(IFeePolicy policy, IFeeLedgerRepository fees)
     {
         _policy = policy;
         _fees = fees;
