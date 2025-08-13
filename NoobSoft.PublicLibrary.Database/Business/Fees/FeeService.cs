@@ -1,3 +1,4 @@
+using System.Runtime.Intrinsics.X86;
 using NoobSoft.PublicLibrary.Database.Business.Fees.Internal;
 using NoobSoft.PublicLibrary.Database.Model;
 using NoobSoft.PublicLibrary.Database.Repository;
@@ -68,13 +69,30 @@ public class FeeService : IFeeService
        return new PostReturnResult(assessment, entry);
     }
 
-    public PaymentReceipt RecordPayment(Guid loanerId, decimal amount, DateTime when)
+    public LedgerEntry RecordPayment(Guid loanerId, decimal amount, DateTime when)
     {
-        throw new NotImplementedException();
+        if (amount <= 0)
+            throw new ArgumentException(nameof(amount), "Payment amount must be positive.");
+
+        // Payments are stored as negative amounts in the ledger
+        var entry = new LedgerEntry(
+            Id: Guid.NewGuid(),
+            LoanerId: loanerId,
+            LoanId: null,
+            Amount: -amount,
+            Reason: "Payment received",
+            PostedAt: when
+        );
+
+        _fees.Append(entry);
+        return entry;
     }
 
     public IReadOnlyList<LedgerEntry> GetLedger(Guid loanerId)
     {
-        throw new NotImplementedException();
+        return _fees.GetByLoaner(loanerId)
+            .OrderByDescending(e => e.PostedAt)
+            .ThenByDescending(e => e.Id) // stable ordering on ties
+            .ToList().AsReadOnly();
     }
 }

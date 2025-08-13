@@ -15,6 +15,6 @@ public interface IFeeService
     
     // Effects (mutate ledger/ repo)
     PostReturnResult PostReturn(Loan loan, DateTime returnedAt); // finalize fee for this book at return time
-    PaymentReceipt RecordPayment(Guid loanerId, decimal amount, DateTime when);
+    LedgerEntry RecordPayment(Guid loanerId, decimal amount, DateTime when);
     IReadOnlyList<LedgerEntry> GetLedger(Guid loanerId);
 }
