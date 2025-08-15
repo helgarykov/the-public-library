@@ -108,6 +108,44 @@ public class FeeServiceTests
         Assert.Equal(181, a.OverdueDays);
         Assert.Equal(300m, a.Fee); // Lost fee=300m
     }
+     
+    // ---- PostReturn ----
+    [Fact]
+    public void PostReturn_NotOverdue_NoLedgerEntry()
+    {
+        var loan = Loan(due: new DateTime(2025, 1, 10));
+        var returned = new DateTime(2025, 1, 10);
+
+        var result = _svc.PostReturn(loan, returned);
+        
+        Assert.False(result.Assessment.IsOverdue);
+        Assert.Null(result.PostedEntry);
+        Assert.Empty(_fees.GetByLoaner(loan.LoanerId));
+    }
+
+    [Fact]
+    public void PostReturn_Overdue_AppendsLedgerEntry()
+    {
+        var loan = Loan(due: new DateTime(2025, 1, 10));
+        var returned = new DateTime(2025, 1, 20); // 10 days overdue
+        
+        var before = _fees.GetByLoaner(loan.LoanerId).Count;
+        var result = _svc.PostReturn(loan, returned);
+        var afterList = _fees.GetByLoaner(loan.LoanerId);
+        
+        Assert.True(result.Assessment.IsOverdue);
+        Assert.NotNull(result.PostedEntry);
+        Assert.Equal(before + 1, afterList.Count);
+
+        var entry = afterList.Last();
+        Assert.Equal(loan.LoanerId, entry.LoanerId);
+        Assert.Equal(loan.Id, entry.LoanId);
+        Assert.Equal(returned, entry.PostedAt);
+        Assert.Equal(result.Assessment.Reason, entry.Reason);
+        Assert.Equal(result.Assessment.Fee, entry.Amount);
+    }
+    
+    // ----RecordPayment ----
 
 
 
