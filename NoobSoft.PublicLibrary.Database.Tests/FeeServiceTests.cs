@@ -197,7 +197,24 @@ public class FeeServiceTests
 
         var debt = _svc.GetOutstandingDebt(loanerId);
         Assert.Equal(290m, debt); // 40 + 300 - 50
+    }
 
+    [Fact]
+    public void IsSuspended_usesThreshhold()
+    {
+        var loanerId = Guid.NewGuid();
+        
+        // < threshold = 100m
+        _fees.Append(new LedgerEntry(Guid.NewGuid(), loanerId,Guid.NewGuid(), 90m, "Late fee", new DateTime(2025,1,10)));
+        Assert.False(_svc.IsSuspended(loanerId));
+        
+        // == threshold 
+        _fees.Append(new LedgerEntry(Guid.NewGuid(), loanerId, Guid.NewGuid(), 10m, "Late fee", new DateTime(2025,1,11)));
+        Assert.True(_svc.IsSuspended(loanerId));
+        
+        // < threshold again
+        _fees.Append(new LedgerEntry(Guid.NewGuid(), loanerId, null, -5m, "Payment received", new DateTime(2025,1,12)));   
+        Assert.False(_svc.IsSuspended(loanerId));
     }
 
     // ---- helper ----
