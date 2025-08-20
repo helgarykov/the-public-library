@@ -59,8 +59,7 @@ public class FeeServiceTests
     public void OverdueDays_AfterDue_One()
     {
         var loan = MakeLoan(
-            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
-            loanPeriodDays: 30);
+            loanedAt: new DateTime(2024, 12, 11)); // +30 = 2025-01-10 due
         
         var asOf = new DateTime(2025, 1, 11);   // 2025-01-10 + 1 = 2025-01-11
 
@@ -86,8 +85,7 @@ public class FeeServiceTests
     public void AssessLoan_OverdueButNotLost_FlagsAndReason()
     {
         var loan = MakeLoan(
-            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
-            loanPeriodDays: 30);
+            loanedAt: new DateTime(2024, 12, 11)); // +30 = 2025-01-10 due
 
         var asOf = new DateTime(2025, 1, 20);   // 10 days overdue
 
@@ -104,8 +102,7 @@ public class FeeServiceTests
     public void AssessLoan_Lost_FlagsAndReason()
     {
         var loan = MakeLoan(
-            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
-            loanPeriodDays: 30);    // 2025-01-10 + 180 = 2025-07-10
+            loanedAt: new DateTime(2024, 12, 11)); // +30 = 2025-01-10 due // 2025-01-10 + 180 = 2025-07-10
         
         var asOf = new DateTime(2025, 7, 10); // 181 days overdue => LostAfterDays=180 => lost
 
@@ -136,8 +133,7 @@ public class FeeServiceTests
     public void PostReturn_Overdue_AppendsLedgerEntry()
     {
         var loan = MakeLoan(
-            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
-            loanPeriodDays: 30);
+            loanedAt: new DateTime(2024, 12, 11)); // +30 = 2025-01-10 due
        
         var returned = new DateTime(2025, 1, 20);  // 2025-01-10 + 10 = 2025-01-20 => 10 days overdue
         
