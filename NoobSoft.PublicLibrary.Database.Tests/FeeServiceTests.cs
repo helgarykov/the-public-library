@@ -40,7 +40,7 @@ public class FeeServiceTests
     [Fact]
     public void OverdueDays_BeforeDue_Zero()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
+        var loan = MakeLoan(new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 9);
 
         Assert.Equal(0, _svc.OverdueDays(loan, asOf));
@@ -49,7 +49,7 @@ public class FeeServiceTests
     [Fact]
     public void OverudeDays_OnDue_Zero()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
+        var loan = MakeLoan(new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 10);
 
         Assert.Equal(0, _svc.OverdueDays(loan, asOf));
@@ -58,8 +58,11 @@ public class FeeServiceTests
     [Fact]
     public void OverdueDays_AfterDue_One()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
-        var asOf = new DateTime(2025, 1, 11);
+        var loan = MakeLoan(
+            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
+            loanPeriodDays: 30);
+        
+        var asOf = new DateTime(2025, 1, 11);   // 2025-01-10 + 1 = 2025-01-11
 
         Assert.Equal(1, _svc.OverdueDays(loan, asOf));
     }
@@ -68,7 +71,7 @@ public class FeeServiceTests
     [Fact]
     public void AssessLoan_NotOverdue_FlagsAndReason()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
+        var loan = MakeLoan(new DateTime(2025, 1, 10));
         var asOf = new DateTime(2025, 1, 10);
 
         var a = _svc.AssessLoan(loan, asOf);
@@ -82,8 +85,11 @@ public class FeeServiceTests
     [Fact]
     public void AssessLoan_OverdueButNotLost_FlagsAndReason()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
-        var asOf = new DateTime(2025, 1, 20);
+        var loan = MakeLoan(
+            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
+            loanPeriodDays: 30);
+
+        var asOf = new DateTime(2025, 1, 20);   // 10 days overdue
 
         var a = _svc.AssessLoan(loan, asOf);
 
@@ -97,7 +103,10 @@ public class FeeServiceTests
     [Fact]
     public void AssessLoan_Lost_FlagsAndReason()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
+        var loan = MakeLoan(
+            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
+            loanPeriodDays: 30);    // 2025-01-10 + 180 = 2025-07-10
+        
         var asOf = new DateTime(2025, 7, 10); // 181 days overdue => LostAfterDays=180 => lost
 
         var a = _svc.AssessLoan(loan, asOf);
@@ -113,7 +122,7 @@ public class FeeServiceTests
     [Fact]
     public void PostReturn_NotOverdue_NoLedgerEntry()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
+        var loan = MakeLoan(new DateTime(2025, 1, 10));
         var returned = new DateTime(2025, 1, 10);
 
         var result = _svc.PostReturn(loan, returned);
@@ -126,8 +135,11 @@ public class FeeServiceTests
     [Fact]
     public void PostReturn_Overdue_AppendsLedgerEntry()
     {
-        var loan = Loan(due: new DateTime(2025, 1, 10));
-        var returned = new DateTime(2025, 1, 20); // 10 days overdue
+        var loan = MakeLoan(
+            loanedAt: new DateTime(2024, 12, 11), // +30 = 2025-01-10 due
+            loanPeriodDays: 30);
+       
+        var returned = new DateTime(2025, 1, 20);  // 2025-01-10 + 10 = 2025-01-20 => 10 days overdue
         
         var before = _fees.GetByLoaner(loan.LoanerId).Count;
         var result = _svc.PostReturn(loan, returned);
@@ -176,19 +188,43 @@ public class FeeServiceTests
         var repoEntry = _fees.GetByLoaner(loanerId).Single();
         Assert.Equal(entry.Id, repoEntry.Id);
     }
+    
+    // ---- GetOutstandingDebt & IsSuspended ----
+    [Fact]
+    public void GetOutstandingDebt_SumsFeesAndPayments()
+    {
+        var loanerId = Guid.NewGuid();
+        
+        _fees.Append(new LedgerEntry( Guid.NewGuid(), loanerId, Guid.NewGuid(), 40m, "Late fee", new DateTime(2025,1,10)));
+        _fees.Append(new LedgerEntry(Guid.NewGuid(), loanerId, Guid.NewGuid(), 300m, "Lost fee", new DateTime(2025,1,20)));
+        _fees.Append(new LedgerEntry( Guid.NewGuid(), loanerId, null, -50m, "Payment received", new DateTime(2025,1,15)));
+
+        var debt = _svc.GetOutstandingDebt(loanerId);
+        Assert.Equal(290m, debt); // 40 + 300 - 50
+
+    }
 
     // ---- helper ----
-    private static Loan Loan(DateTime due)
+    private static Loan MakeLoan(
+        DateTime loanedAt,
+        int loanPeriodDays = 30,
+        Guid? loanerId = null,
+        Guid? bookId = null,
+        DateTime? dueAt = null,
+        DateTime? returnedAt = null,
+        decimal fee = 0m)
     {
         return new Loan
         {
             Id = Guid.NewGuid(),
-            BookId = Guid.NewGuid(),
-            LoanerId = Guid.NewGuid(),
-            DueAt = due,
-            LoanedAt = due.AddDays(-14),
-            ReturnedAt = null
+            BookId = bookId ?? Guid.NewGuid(),
+            LoanerId = loanerId ?? Guid.NewGuid(),
+            LoanedAt = loanedAt,
+            DueAt = dueAt ?? loanedAt.AddDays(loanPeriodDays),
+            ReturnedAt = returnedAt,
+            Fee = fee
         };
     }
+
 }   
     
