@@ -146,11 +146,36 @@ public class FeeServiceTests
     }
     
     // ----RecordPayment ----
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-5)]
+    public void RecordPayment_AmountLessOrEqualZero_ThrowsArgumentException(decimal invalidAmount)
+    {
+        var loanerId = Guid.NewGuid();
+        
+        var ex = Assert.Throws<ArgumentException>(() => 
+            _svc.RecordPayment(loanerId, invalidAmount, DateTime.UtcNow));
+        
+        Assert.Equal("Payment amount must be positive.", ex.ParamName);
+    }
 
-
-
-
-
+    [Fact]
+    public void RecordPayment_Positive_AppendsNegativeAmount()
+    {
+        var loanerId = Guid.NewGuid();
+        var when = new DateTime(2025, 1, 15);
+        
+        var entry = _svc.RecordPayment(loanerId, 50m, when);
+        
+        Assert.Equal(loanerId, entry.LoanerId);
+        Assert.Null(entry.LoanId);
+        Assert.Equal(when, entry.PostedAt);
+        Assert.Equal("Payment received", entry.Reason);
+        Assert.Equal(-50m, entry.Amount); 
+        
+        var repoEntry = _fees.GetByLoaner(loanerId).Single();
+        Assert.Equal(entry.Id, repoEntry.Id);
+    }
 
     // ---- helper ----
     private static Loan Loan(DateTime due)
