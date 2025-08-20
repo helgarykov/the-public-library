@@ -45,8 +45,11 @@ public class FeeService : IFeeService
     public decimal GetOutstandingDebt(Guid loanerId) =>
         _fees.GetOutstandingDebt(loanerId);
 
-    public bool IsSuspended(Guid loanerId) =>
-        _fees.GetOutstandingDebt(loanerId) >= _policy.SuspensionThreshold;
+    public bool IsSuspended(Guid loanerId)
+    {
+        var debt = _fees.GetOutstandingDebt(loanerId);
+        return FeeCalculator.IsSuspended(debt, _policy);
+    }
 
     public PostReturnResult PostReturn(Loan loan, DateTime returnedAt)
     {
