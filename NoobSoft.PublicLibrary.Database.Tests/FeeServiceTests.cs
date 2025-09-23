@@ -216,6 +216,38 @@ public class FeeServiceTests
         _fees.Append(new LedgerEntry(Guid.NewGuid(), loanerId, null, -5m, "Payment received", new DateTime(2025,1,12)));   
         Assert.False(_svc.IsSuspended(loanerId));
     }
+    
+    // ---- GetLedger ordering ----
+    [Fact]
+    public void GetLedger_OrdersByDateDescThenIdDesc()
+    {
+        var loanerId = Guid.NewGuid();
+        var t = new DateTime(2025, 9, 23);
+        
+        var e1 = new LedgerEntry(new Guid(), loanerId, Guid.NewGuid(), 10m, "Late", t);
+        var e2 = new LedgerEntry(new Guid(), loanerId, Guid.NewGuid(), 20m, "Late", t.AddDays(1));
+        var e3_sameTime = new LedgerEntry(new Guid(), loanerId, Guid.NewGuid(), 30m, "Late", t.AddDays(1));
+        
+        _fees.Append(e1);
+        _fees.Append(e2);
+        _fees.Append(e3_sameTime);
+        
+        var ordered = _svc.GetLedger(loanerId).ToList();
+        
+        // Newest date first
+        Assert.Equal(new[] {t.AddDays(1), t.AddDays(1), t }, ordered.Select(x => x.PostedAt));
+        
+        // For items with the same timestamp, higher Guid (lexicographically) should come first due to ThenByDescending(Id)
+        
+        var expectedIds = ordered
+            .OrderByDescending(x => x.PostedAt)
+            .ThenByDescending(x => x.Id)
+            .Select(x => x.Id)
+            .ToList();
+        
+        var actualIds = ordered.Select(x => x.Id).ToList();
+        Assert.Equal(expectedIds, actualIds);
+    }
 
     // ---- helper ----
     private static Loan MakeLoan(
