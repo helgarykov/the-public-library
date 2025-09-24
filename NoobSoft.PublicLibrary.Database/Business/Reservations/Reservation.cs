@@ -1,6 +1,6 @@
 namespace NoobSoft.PublicLibrary.Database.Business.Reservations;
 
-public sealed class Reservations
+public sealed class Reservation
 {
     public Guid Id { get; init; } = Guid.NewGuid();
     public Guid BookId { get; init; }
